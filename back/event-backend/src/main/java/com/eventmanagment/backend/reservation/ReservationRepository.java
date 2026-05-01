@@ -12,4 +12,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByEventIdAndProviderUserIdAndStatus(
             Long eventId, Long providerUserId, ReservationStatus status);
+
+    long countByStatus(ReservationStatus status);
 }

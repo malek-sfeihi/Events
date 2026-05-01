@@ -3,6 +3,8 @@ package com.eventmanagment.backend.reservation;
 import com.eventmanagment.backend.common.ResourceNotFoundException;
 import com.eventmanagment.backend.event.Event;
 import com.eventmanagment.backend.event.EventRepository;
+import com.eventmanagment.backend.provider.ProviderProfile;
+import com.eventmanagment.backend.provider.ProviderProfileRepository;
 import com.eventmanagment.backend.reservation.dto.CreateReservationRequest;
 import com.eventmanagment.backend.reservation.dto.ReservationResponse;
 import com.eventmanagment.backend.user.Role;
@@ -22,6 +24,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final ProviderProfileRepository providerProfileRepository;
 
     @Transactional
     public ReservationResponse create(String organizerEmail, CreateReservationRequest request) {
@@ -39,6 +42,17 @@ public class ReservationService {
 
         if (provider.getRole() != Role.PRESTATAIRE) {
             throw new IllegalArgumentException("Target user must be a PRESTATAIRE");
+        }
+
+        if (!provider.isEnabled()) {
+            throw new IllegalArgumentException("Provider account is disabled");
+        }
+
+        ProviderProfile profile = providerProfileRepository.findByProviderUserId(provider.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Provider must complete a profile before bookings"));
+
+        if (!profile.isApproved()) {
+            throw new IllegalArgumentException("Provider profile is not approved yet");
         }
 
         reservationRepository

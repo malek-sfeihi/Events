@@ -29,6 +29,7 @@ public class ProviderProfileService {
         ProviderProfile profile = providerProfileRepository.findByProviderUserId(provider.getId())
                 .orElseGet(() -> ProviderProfile.builder()
                         .providerUserId(provider.getId())
+                        .approved(false)
                         .createdAt(Instant.now())
                         .build());
 
@@ -75,7 +76,8 @@ public class ProviderProfileService {
                 profile.getMaxCapacity(),
                 profile.getAcceptedEventTypes(),
                 profile.getMinimumPrice(),
-                profile.getAvailabilityNotes()
+                profile.getAvailabilityNotes(),
+                profile.isApproved()
         );
     }
 }

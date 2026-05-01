@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Data
 @Builder
@@ -59,4 +60,9 @@ public class ProviderProfile {
 
     @Column(nullable = false)
     private Instant updatedAt;
+
+    /** Validated by admin; only approved profiles appear in the public catalog for organizers. */
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean approved;
 }

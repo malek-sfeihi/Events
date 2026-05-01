@@ -1,15 +1,14 @@
-package com.eventmanagment.backend.provider.dto;
+package com.eventmanagment.backend.catalog.dto;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
-public record ProviderProfileResponse(
-        Long id,
+public record ProviderCatalogItem(
+        Long providerUserId,
         String businessName,
         Integer minCapacity,
         Integer maxCapacity,
         Set<String> acceptedEventTypes,
         BigDecimal minimumPrice,
-        String availabilityNotes,
-        boolean approved
+        String availabilityNotes
 ) {}
