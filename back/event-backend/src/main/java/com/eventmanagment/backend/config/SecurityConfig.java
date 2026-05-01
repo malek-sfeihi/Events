@@ -4,6 +4,7 @@ import com.eventmanagment.backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -30,6 +31,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/health").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reservations").hasRole("ORGANISATEUR")
+                        .requestMatchers(HttpMethod.GET, "/api/reservations/sent").hasRole("ORGANISATEUR")
+                        .requestMatchers(HttpMethod.GET, "/api/reservations/received").hasRole("PRESTATAIRE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/reservations/*/accept").hasRole("PRESTATAIRE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/reservations/*/reject").hasRole("PRESTATAIRE")
                         .requestMatchers("/api/events/**").hasRole("ORGANISATEUR")
                         .requestMatchers("/api/providers/**").hasRole("PRESTATAIRE")
                         .anyRequest().authenticated())
