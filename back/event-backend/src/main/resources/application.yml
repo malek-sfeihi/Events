@@ -18,3 +18,10 @@ app:
   jwt:
     secret: Zm9yLWRldi1vbmx5LWNoYW5nZS10aGlzLXNlY3JldC1rZXk=
     expiration-ms: 86400000
+
+# Moteur IA / ML : FastAPI (Python). Le backend agrège les données et envoie POST à ce service.
+recommendation:
+  python:
+    enabled: true
+    base-url: http://127.0.0.1:8000
+    score-path: /api/v1/recommendations/score

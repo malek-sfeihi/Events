@@ -9,5 +9,6 @@ public record EventResponse(
         LocalDate eventDate,
         Integer participantCount,
         BigDecimal budget,
-        String preferences
+        String preferences,
+        String photoUrl
 ) {}

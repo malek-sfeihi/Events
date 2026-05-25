@@ -14,4 +14,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             Long eventId, Long providerUserId, ReservationStatus status);
 
     long countByStatus(ReservationStatus status);
+
+    long countByProviderUserIdAndStatus(Long providerUserId, ReservationStatus status);
+
+    void deleteByOrganizerUserId(Long organizerUserId);
+
+    void deleteByProviderUserId(Long providerUserId);
+
+    void deleteByEventIdIn(Iterable<Long> eventIds);
 }

@@ -1,0 +1,16 @@
+# IDE
+.idea/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Uploads locales (médias dev)
+uploads/
+back/event-backend/uploads/
+
+# Cours / docs externes non liés au dépôt applicatif
+cours pour la matiére angular/

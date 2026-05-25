@@ -1,0 +1,97 @@
+<section class="panel motion-fade">
+  <h1 class="panel-title">Catalogue prestataires</h1>
+  <p class="panel-lead">
+    Prestataires validés par l’administration. Filtrez par type d’événement qu’ils acceptent, puis envoyez une demande liée à
+    l’un de vos projets.
+  </p>
+
+  <div class="toolbar">
+    <label class="field-inline grow">
+      <span>Filtrer (type d’événement)</span>
+      <input type="text" [(ngModel)]="filterType" placeholder="ex. Mariage" name="filterType" />
+    </label>
+    <button type="button" class="btn btn-ghost" (click)="applyFilter()" [disabled]="loading()">Appliquer</button>
+  </div>
+
+  @if (error()) {
+    <p class="panel-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement…</p>
+  } @else if (providers().length === 0) {
+    <p class="muted">Aucun prestataire ne correspond pour l’instant.</p>
+  } @else {
+    <ul class="card-list">
+      @for (p of providers(); track p.providerUserId) {
+        <li class="catalog-card catalog-card--visual">
+          <div class="catalog-card-cover">
+            <img
+              [src]="coverUrl(p.providerUserId)"
+              alt=""
+              width="800"
+              height="450"
+              loading="lazy"
+            />
+          </div>
+          <div class="catalog-card-body">
+            <div class="catalog-card-head">
+              <strong>{{ p.businessName }}</strong>
+              <span class="price-tag">à partir de {{ p.minimumPrice | number : '1.2-2' }} DT</span>
+            </div>
+            <p class="catalog-meta">Capacité {{ p.minCapacity }} – {{ p.maxCapacity }} invités</p>
+            <div class="catalog-card-tags">
+              @for (t of p.acceptedEventTypes.slice(0, 4); track t) {
+                <span class="tag-pill">{{ t }}</span>
+              }
+              @if (p.acceptedEventTypes.length > 4) {
+                <span class="tag-pill">+{{ p.acceptedEventTypes.length - 4 }}</span>
+              }
+            </div>
+            @if (p.availabilityNotes) {
+              <p class="catalog-notes">{{ p.availabilityNotes }}</p>
+            }
+            <button type="button" class="btn btn-accent btn-sm" (click)="openBook(p)">Demander une réservation</button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>
+
+@if (bookTarget(); as target) {
+  <div class="modal-backdrop" (click)="closeBook()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">Demande pour {{ target.businessName }}</h2>
+      <p class="muted">Associez un de vos événements. Le prestataire doit être approuvé et actif.</p>
+      @if (events().length === 0) {
+        <p class="panel-error">Créez d’abord un événement dans l’onglet « Événements ».</p>
+      } @else {
+        <label class="field-inline field-block">
+          <span>Événement</span>
+          <select
+            [ngModel]="selectedEventId()"
+            (ngModelChange)="selectedEventId.set($event)"
+            name="eventPick"
+          >
+            <option [ngValue]="null">— Choisir —</option>
+            @for (e of events(); track e.id) {
+              <option [ngValue]="e.id">{{ e.eventType }} · {{ e.eventDate }}</option>
+            }
+          </select>
+        </label>
+      }
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeBook()" [disabled]="booking()">Annuler</button>
+        <button
+          type="button"
+          class="btn btn-accent"
+          (click)="confirmBook()"
+          [disabled]="booking() || events().length === 0"
+        >
+          Envoyer la demande
+        </button>
+      </div>
+    </div>
+  </div>
+}

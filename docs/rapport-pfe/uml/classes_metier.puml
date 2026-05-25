@@ -1,0 +1,95 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+title Vue de conception --- données persistées et module IA (interfaces)
+
+enum Role {
+  ORGANISATEUR
+  PRESTATAIRE
+  ADMIN
+}
+
+enum ReservationStatus {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+}
+
+class User {
+  - id : Long
+  - email : String
+  - password : String
+  - fullName : String
+  - role : Role
+  - enabled : boolean
+  - createdAt : Instant
+}
+
+class Event {
+  - id : Long
+  - organizerId : Long
+  - eventType : String
+  - eventDate : LocalDate
+  - participantCount : Integer
+  - budget : BigDecimal
+  - preferences : String
+  - createdAt : Instant
+  - updatedAt : Instant
+}
+
+class ProviderProfile {
+  - id : Long
+  - providerUserId : Long
+  - businessName : String
+  - minCapacity : Integer
+  - maxCapacity : Integer
+  - acceptedEventTypes : Set<String>
+  - minimumPrice : BigDecimal
+  - availabilityNotes : String
+  - approved : boolean
+  - createdAt : Instant
+  - updatedAt : Instant
+}
+
+class Reservation {
+  - id : Long
+  - eventId : Long
+  - organizerUserId : Long
+  - providerUserId : Long
+  - status : ReservationStatus
+  - createdAt : Instant
+  - updatedAt : Instant
+}
+
+User "1" -- "0..*" Event : organise >
+User "1" -- "0..1" ProviderProfile : possède\n(si PRESTATAIRE) >
+User "1" -- "0..*" Reservation : organisateur >
+User "1" -- "0..*" Reservation : prestataire >
+Event "1" -- "0..*" Reservation : concerne >
+
+class RecommendationScore << valeur retournée >> {
+  + compatibilityScore : double
+  + acceptanceProbability : double
+  + rankedProviderIds : List<Long>
+  + explanationSummary : String
+}
+
+interface IARecommendationService << conception >> {
+  + rankProvidersForEvent(eventId : Long)
+  + scorePair(eventId : Long, providerUserId : Long) : RecommendationScore
+}
+
+IARecommendationService ..> Event : agrège\n(caractéristiques)
+IARecommendationService ..> ProviderProfile : agrège\n(offre)
+IARecommendationService ..> Reservation : peut exploiter\nhistorique / taux
+IARecommendationService ..> RecommendationScore : produit
+
+note bottom of IARecommendationService
+  **Conception figée** : contrat d'API interne ou REST
+  (\texttt{/api/recommendations/...}) pour l'itération 2.
+  Non implémenté dans le code MVP actuel.
+end note
+
+@enduml

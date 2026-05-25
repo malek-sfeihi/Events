@@ -1,0 +1,60 @@
+<section class="panel motion-fade">
+  <h1 class="panel-title">Demandes reçues</h1>
+  <p class="panel-lead">Acceptez ou refusez les réservations en attente.</p>
+
+  @if (error()) {
+    <p class="panel-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement…</p>
+  } @else if (rows().length === 0) {
+    <p class="muted">Aucune demande pour le moment.</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Événement (id)</th>
+            <th>Organisateur (id)</th>
+            <th>Statut</th>
+            <th>Créée</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of rows(); track r.id) {
+            <tr>
+              <td>{{ r.eventId }}</td>
+              <td>{{ r.organizerUserId }}</td>
+              <td>
+                <span class="badge" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
+              </td>
+              <td class="muted">{{ r.createdAt | date : 'short' }}</td>
+              <td class="cell-actions">
+                @if (r.status === 'EN_ATTENTE') {
+                  <button
+                    type="button"
+                    class="btn-link"
+                    (click)="accept(r.id)"
+                    [disabled]="actingId() !== null"
+                  >
+                    Accepter
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-link danger"
+                    (click)="reject(r.id)"
+                    [disabled]="actingId() !== null"
+                  >
+                    Refuser
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

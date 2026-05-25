@@ -1,0 +1,91 @@
+<section class="panel motion-fade">
+  <h1 class="panel-title">Mes événements</h1>
+  <p class="panel-lead">Créez et gérez vos projets ; ils serviront aux demandes de réservation.</p>
+
+  @if (error()) {
+    <p class="panel-error" role="alert">{{ error() }}</p>
+  }
+
+  <form class="event-form" [formGroup]="form" (ngSubmit)="submit()">
+    <h2 class="form-section-title">{{ editingId() !== null ? 'Modifier l’événement' : 'Nouvel événement' }}</h2>
+    <div class="form-grid">
+      <label class="field-inline">
+        <span>Type</span>
+        <input type="text" formControlName="eventType" placeholder="ex. Mariage, Séminaire" />
+      </label>
+      <label class="field-inline">
+        <span>Date</span>
+        <input type="date" formControlName="eventDate" [attr.min]="today" />
+      </label>
+      <label class="field-inline">
+        <span>Participants</span>
+        <input type="number" formControlName="participantCount" min="1" />
+      </label>
+      <label class="field-inline">
+        <span>Budget (DT)</span>
+        <input type="number" formControlName="budget" min="0.01" step="0.01" />
+      </label>
+    </div>
+    <label class="field-inline field-block">
+      <span>Préférences (optionnel)</span>
+      <textarea formControlName="preferences" rows="2" placeholder="Style, contraintes…"></textarea>
+    </label>
+    <label class="field-inline field-block">
+      <span>Photo de l’événement (optionnel)</span>
+      <input type="file" accept="image/*" (change)="onEventPhotoSelected($event)" />
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-accent" [disabled]="saving()">
+        {{ editingId() !== null ? 'Enregistrer' : 'Créer' }}
+      </button>
+      @if (editingId() !== null) {
+        <button type="button" class="btn btn-ghost" (click)="cancelEdit()" [disabled]="saving()">Annuler</button>
+      }
+    </div>
+  </form>
+</section>
+
+<section class="panel motion-fade">
+  <h2 class="form-section-title">Liste</h2>
+  @if (loading()) {
+    <p class="muted">Chargement…</p>
+  } @else if (events().length === 0) {
+    <p class="muted">Aucun événement pour le moment.</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Participants</th>
+            <th>Budget</th>
+            <th>Photo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of events(); track e.id) {
+            <tr>
+              <td>{{ e.eventType }}</td>
+              <td>{{ e.eventDate }}</td>
+              <td>{{ e.participantCount }}</td>
+              <td>{{ e.budget | number : '1.2-2' }} DT</td>
+              <td>
+                @if (e.photoUrl) {
+                  <img [src]="photoSrc(e.photoUrl)" alt="" width="80" height="50" />
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td class="cell-actions">
+                <button type="button" class="btn-link" (click)="startEdit(e)">Modifier</button>
+                <button type="button" class="btn-link danger" (click)="delete(e)">Supprimer</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

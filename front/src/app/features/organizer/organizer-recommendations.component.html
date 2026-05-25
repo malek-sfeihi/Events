@@ -1,0 +1,67 @@
+<section class="panel motion-fade">
+  <h1 class="panel-title">Recommandations intelligentes</h1>
+  <p class="panel-lead">
+    Classement des prestataires validés selon l’adéquation avec l’un de vos événements : type, capacité, budget et historique
+    d’acceptation. Les probabilités sont indicatives et accompagnées d’un court texte explicatif.
+  </p>
+
+  @if (error()) {
+    <p class="panel-error" role="alert">{{ error() }}</p>
+  }
+
+  <div class="toolbar">
+    <label class="field-inline grow">
+      <span>Événement</span>
+      <select
+        name="eventId"
+        [(ngModel)]="selectedEventId"
+        (ngModelChange)="onEventChange()"
+        [disabled]="loadingEvents() || events().length === 0"
+      >
+        <option [ngValue]="null">— Choisir —</option>
+        @for (e of events(); track e.id) {
+          <option [ngValue]="e.id">
+            {{ e.eventType }} — {{ e.eventDate }} ({{ e.participantCount }} pers., {{ e.budget | number : '1.2-2' }} DT)
+          </option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (loadingEvents()) {
+    <p class="muted">Chargement des événements…</p>
+  } @else if (events().length === 0) {
+    <p class="muted">Créez d’abord un événement pour obtenir des recommandations.</p>
+  } @else if (selectedEventId === null) {
+    <p class="muted">Sélectionnez un événement pour afficher le classement.</p>
+  } @else if (loadingScores()) {
+    <p class="muted">Calcul du classement…</p>
+  } @else if (scores().length === 0) {
+    <p class="muted">Aucun prestataire éligible pour le moment.</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Prestataire</th>
+            <th>Score</th>
+            <th>P prob.</th>
+            <th>Explication</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of scores(); track r.providerUserId; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ r.businessName }}</td>
+              <td>{{ r.compatibilityScore }} / 100</td>
+              <td>{{ r.acceptanceProbability | number : '1.0-2' }}</td>
+              <td class="cell-explain">{{ r.explanation }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

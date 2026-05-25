@@ -6,5 +6,6 @@ public record AuthResponse(
         String token,
         Long userId,
         String email,
-        Role role
+        Role role,
+        String photoUrl
 ) {}

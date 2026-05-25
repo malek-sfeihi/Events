@@ -1,0 +1,247 @@
+<div class="admin-hub motion-fade">
+  <h1 class="admin-hub-title">Centre de contrôle</h1>
+  <p class="admin-hub-lead">
+    Tu gères la <strong>qualité</strong> de la place de marché : chiffres clés, profils prestataires à valider, et comptes
+    actifs. Ce n’est pas un réseau social : c’est un <strong>tableau de pilotage</strong> — la partie « fun » côté
+    organisateur / prestataire ; ici c’est <strong>la confiance</strong> et la modération.
+  </p>
+</div>
+
+@if (error()) {
+  <p class="panel-error" role="alert">{{ error() }}</p>
+}
+
+@if (loading()) {
+  <p class="muted">Chargement…</p>
+}
+
+@if (!loading() && stats(); as s) {
+  <section class="panel motion-fade">
+    <div class="section-head">
+      <h2 class="form-section-title" style="margin: 0">Indicateurs</h2>
+    </div>
+    <div class="stat-grid--rich">
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span class="stat-value">{{ s.totalUsers }}</span>
+        <span class="stat-label">Utilisateurs</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M3 10h18" />
+        </svg>
+        <span class="stat-value">{{ s.eventCount }}</span>
+        <span class="stat-label">Événements</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M4 4.5A2.5 2.5 0 0 0 6.5 7H20" />
+          <path d="M6.5 7v10" />
+        </svg>
+        <span class="stat-value">{{ s.reservationCount }}</span>
+        <span class="stat-label">Réservations</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+        <span class="stat-value">{{ s.reservationPendingCount }}</span>
+        <span class="stat-label">En attente</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+        <span class="stat-value">{{ s.reservationAcceptedCount }}</span>
+        <span class="stat-label">Acceptées</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+        <span class="stat-value">{{ s.reservationRejectedCount }}</span>
+        <span class="stat-label">Refusées</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        <span class="stat-value">{{ s.pendingProviderProfilesCount }}</span>
+        <span class="stat-label">Profils à valider</span>
+      </div>
+      <div class="stat-card-rich">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        </svg>
+        <span class="stat-value">{{ s.organizerCount }} / {{ s.prestataireCount }}</span>
+        <span class="stat-label">Org. / Prest.</span>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="panel motion-fade">
+  <div class="section-head">
+    <h2 class="form-section-title">Validation prestataires</h2>
+    @if (!loading() && pending().length > 0) {
+      <span class="badge badge-warn">{{ pending().length }} en attente</span>
+    }
+  </div>
+
+  @if (!loading() && pending().length === 0) {
+    <div class="empty-state">
+      <p><strong>Rien à traiter.</strong> Les nouveaux profils prestataires non approuvés apparaîtront ici pour que tu puisses les valider avant mise en catalogue.</p>
+    </div>
+  } @else if (!loading()) {
+    <ul class="pending-list">
+      @for (p of pending(); track p.providerUserId) {
+        <li class="pending-card">
+          <div>
+            <strong>{{ p.fullName }}</strong>
+            <span class="muted"> · {{ p.email }}</span>
+            <p class="pending-profile">
+              {{ p.profile.businessName }} · capacité {{ p.profile.minCapacity }}–{{ p.profile.maxCapacity }} · à partir de
+              {{ p.profile.minimumPrice | number : '1.2-2' }} DT
+            </p>
+            <p class="muted small">{{ p.profile.acceptedEventTypes.join(', ') }}</p>
+          </div>
+          <button
+            type="button"
+            class="btn btn-accent btn-sm"
+            (click)="approve(p.providerUserId)"
+            [disabled]="approvingId() !== null"
+          >
+            Approuver le profil
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>
+
+<section class="panel motion-fade">
+  <div class="section-head">
+    <h2 class="form-section-title">Comptes utilisateurs</h2>
+  </div>
+  <p class="users-toolbar">
+    Liste complète : tu vois chaque <strong>ID</strong>, le rôle et l’état. Tu peux <strong>désactiver</strong> ou
+    <strong>supprimer définitivement</strong> un organisateur ou un prestataire (pas un admin, pas ton propre compte).
+  </p>
+
+  @if (!loading() && users().length > 0) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>État</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of users(); track u.id) {
+            <tr>
+              <td>{{ u.id }}</td>
+              <td>{{ u.fullName }}</td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span
+                  class="role-badge"
+                  [class.role-badge--org]="u.role === 'ORGANISATEUR'"
+                  [class.role-badge--presta]="u.role === 'PRESTATAIRE'"
+                  [class.role-badge--admin]="u.role === 'ADMIN'"
+                >
+                  {{ roleLabel(u.role) }}
+                </span>
+              </td>
+              <td>
+                <span class="status-dot" [class.is-off]="!u.enabled">
+                  {{ u.enabled ? 'Actif' : 'Désactivé' }}
+                </span>
+              </td>
+              <td class="cell-actions">
+                @if (isSelf(u.id)) {
+                  <span class="muted small">Vous</span>
+                } @else {
+                  <div class="cell-actions-group">
+                    @if (u.enabled) {
+                      <button
+                        type="button"
+                        class="btn-link danger"
+                        (click)="toggleAccount(u, false)"
+                        [disabled]="togglingUserId() !== null || deletingUserId() !== null"
+                      >
+                        Désactiver
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn-link"
+                        (click)="toggleAccount(u, true)"
+                        [disabled]="togglingUserId() !== null || deletingUserId() !== null"
+                      >
+                        Activer
+                      </button>
+                    }
+                    @if (canDelete(u)) {
+                      <button
+                        type="button"
+                        class="btn-link danger"
+                        (click)="deleteAccount(u)"
+                        [disabled]="togglingUserId() !== null || deletingUserId() !== null"
+                      >
+                        @if (deletingUserId() === u.id) {
+                          Suppression…
+                        } @else {
+                          Supprimer
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+<section class="panel motion-fade">
+  <details class="manual-box">
+    <summary>Activer / désactiver par ID (manuel)</summary>
+    <p class="panel-lead small" style="margin-top: 0.5rem">
+      Si tu connais déjà l’identifiant numérique (colonne ID ci-dessus ou export futur), tu peux forcer le statut ici.
+    </p>
+    @if (enableError()) {
+      <p class="panel-error" role="alert">{{ enableError() }}</p>
+    }
+    @if (enableSuccess()) {
+      <p class="panel-success">{{ enableSuccess() }}</p>
+    }
+    <form [formGroup]="enableForm" (ngSubmit)="submitEnable()" class="enable-row">
+      <label class="field-inline">
+        <span>ID utilisateur</span>
+        <input type="text" formControlName="userId" inputmode="numeric" autocomplete="off" />
+      </label>
+      <label class="field-checkbox">
+        <input type="checkbox" formControlName="enabled" />
+        <span>Compte actif</span>
+      </label>
+      <button type="submit" class="btn btn-accent" [disabled]="enableSaving()">Appliquer</button>
+    </form>
+  </details>
+</section>

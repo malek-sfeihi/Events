@@ -2,6 +2,7 @@ package com.eventmanagment.backend.admin;
 
 import com.eventmanagment.backend.admin.dto.AdminPendingProviderResponse;
 import com.eventmanagment.backend.admin.dto.AdminStatsResponse;
+import com.eventmanagment.backend.admin.dto.AdminUserSummaryResponse;
 import com.eventmanagment.backend.admin.dto.UpdateUserEnabledRequest;
 import com.eventmanagment.backend.common.ResourceNotFoundException;
 import com.eventmanagment.backend.event.EventRepository;
@@ -13,7 +14,9 @@ import com.eventmanagment.backend.reservation.ReservationStatus;
 import com.eventmanagment.backend.user.Role;
 import com.eventmanagment.backend.user.User;
 import com.eventmanagment.backend.user.UserRepository;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,14 @@ public class AdminService {
                 .toList();
     }
 
+    public List<AdminUserSummaryResponse> listUsers() {
+        return userRepository.findAll().stream()
+                .sorted(Comparator.comparing(User::getId))
+                .map(u -> new AdminUserSummaryResponse(
+                        u.getId(), u.getEmail(), u.getFullName(), u.getRole(), u.isEnabled()))
+                .toList();
+    }
+
     @Transactional
     public ProviderProfileResponse approveProvider(Long providerUserId) {
         ProviderProfile profile = providerProfileRepository.findByProviderUserId(providerUserId)
@@ -71,8 +82,7 @@ public class AdminService {
 
     @Transactional
     public void updateUserEnabled(Long userId, UpdateUserEnabledRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail.toLowerCase())
-                .orElseThrow(() -> new ResourceNotFoundException("Admin user not found"));
+        User admin = requireAdmin(adminEmail);
 
         if (userId.equals(admin.getId())) {
             throw new AccessDeniedException("Cannot change your own account status");
@@ -83,6 +93,64 @@ public class AdminService {
 
         user.setEnabled(request.enabled());
         userRepository.save(user);
+    }
+
+    /**
+     * Suppression définitive d'un organisateur ou prestataire (données liées incluses).
+     * Réservé à l'admin ; impossible sur un compte ADMIN ou sur soi-même.
+     */
+    @Transactional
+    public void deleteUser(Long userId, String adminEmail) {
+        User admin = requireAdmin(adminEmail);
+
+        if (userId.equals(admin.getId())) {
+            throw new AccessDeniedException("Cannot delete your own account");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getRole() == Role.ADMIN) {
+            throw new IllegalArgumentException("Cannot delete an ADMIN account");
+        }
+        if (user.getRole() != Role.ORGANISATEUR && user.getRole() != Role.PRESTATAIRE) {
+            throw new IllegalArgumentException("Only ORGANISATEUR or PRESTATAIRE accounts can be deleted");
+        }
+
+        if (user.getRole() == Role.ORGANISATEUR) {
+            deleteOrganizerData(user.getId());
+        } else {
+            deleteProviderData(user.getId());
+        }
+
+        userRepository.delete(user);
+    }
+
+    private User requireAdmin(String adminEmail) {
+        User admin = userRepository
+                .findByEmail(adminEmail.toLowerCase(Locale.ROOT))
+                .orElseThrow(() -> new ResourceNotFoundException("Admin user not found"));
+        if (admin.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Only ADMIN can perform this action");
+        }
+        return admin;
+    }
+
+    private void deleteOrganizerData(Long organizerUserId) {
+        List<Long> eventIds = eventRepository.findByOrganizerIdOrderByEventDateAsc(organizerUserId).stream()
+                .map(e -> e.getId())
+                .toList();
+
+        if (!eventIds.isEmpty()) {
+            reservationRepository.deleteByEventIdIn(eventIds);
+        }
+        reservationRepository.deleteByOrganizerUserId(organizerUserId);
+        eventRepository.deleteByOrganizerId(organizerUserId);
+    }
+
+    private void deleteProviderData(Long providerUserId) {
+        reservationRepository.deleteByProviderUserId(providerUserId);
+        providerProfileRepository.deleteByProviderUserId(providerUserId);
     }
 
     private AdminPendingProviderResponse toPendingRow(ProviderProfile profile) {

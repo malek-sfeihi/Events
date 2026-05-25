@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/events")
@@ -51,5 +53,14 @@ public class EventController {
     public ResponseEntity<Void> delete(@PathVariable Long eventId, Authentication authentication) {
         eventService.delete(authentication.getName(), eventId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{eventId}/photo")
+    public ResponseEntity<EventResponse> uploadPhoto(
+            @PathVariable Long eventId,
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(eventService.uploadPhoto(authentication.getName(), eventId, file));
     }
 }

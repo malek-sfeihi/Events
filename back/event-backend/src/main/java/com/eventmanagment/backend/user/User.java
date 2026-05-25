@@ -50,6 +50,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column(length = 400)
+    private String photoUrl;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

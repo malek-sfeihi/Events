@@ -10,4 +10,6 @@ public interface ProviderProfileRepository extends JpaRepository<ProviderProfile
     List<ProviderProfile> findByApproved(boolean approved);
 
     long countByApproved(boolean approved);
+
+    void deleteByProviderUserId(Long providerUserId);
 }

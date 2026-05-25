@@ -1,0 +1,29 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+title Séquence de conception --- obtention de recommandations (module IA)
+
+actor "Organisateur" as O
+participant "Frontend" as F
+participant "API Gateway /\nSpring Boot" as B
+participant "Service métier\n(réservations, catalogue)" as M
+participant "Module IA\n(conception)" as IA
+database "PostgreSQL\n(données événements,\nprofils, historique)" as D
+
+O -> F : Demande « meilleurs prestataires »\npour un événement
+F -> B : GET /api/recommendations/...\n(eventId) **(prévu conception)**
+B -> M : Charge événement,\nfiltre prestataires éligibles
+M -> D : Lecture Event, ProviderProfile,\nReservation (historique)
+D --> M
+M -> IA : Contexte structuré\n(features événement / offres)
+IA --> M : Liste ordonnée +\nscores + probabilités +\nexplications synthétiques
+M --> B : DTO réponse
+B --> F : Affichage classement,\nscores, probabilités
+F --> O : Décision éclairée\npuis envoi demande classique
+
+note over IA
+  Cette interaction décrit la **cible de conception**.
+  Le endpoint et le moteur IA seront réalisés\naprès stabilisation du MVP métier.
+end note
+
+@enduml

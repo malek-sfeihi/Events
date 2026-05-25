@@ -1,0 +1,61 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam roundcorner 8
+skinparam packageStyle rectangle
+left to right direction
+
+actor "Organisateur" as O
+actor "Prestataire" as P
+actor "Administrateur" as A
+
+package "Couche métier --- réalisée dans le code (MVP)" #E8F4EC {
+  usecase "S'inscrire / Se connecter\n(JWT)" as UC_AUTH
+  usecase "Gérer ses événements\n(CRUD)" as UC_EV
+  usecase "Consulter le catalogue\nprestataires approuvés" as UC_CAT
+  usecase "Envoyer une demande\nde réservation" as UC_REQ
+  usecase "Suivre ses demandes\nenvoyées" as UC_SENT
+
+  usecase "Gérer son profil\nprestataire" as UC_PROF
+  usecase "Recevoir et traiter\nles demandes" as UC_IN
+
+  usecase "Tableau de bord\nstatistiques" as UC_DASH
+  usecase "Valider les profils\nen attente" as UC_APP
+  usecase "Gérer les comptes\nutilisateurs" as UC_USERS
+}
+
+package "Module d'aide à la décision (IA)\n--- conception terminée,\nimplémentation prévue (itération 2)" #FFF4E8 {
+  usecase "Obtenir un classement\nou des recommandations\nde prestataires" as UC_RANK
+  usecase "Consulter un score de\ncompatibilité\n(événement / prestataire)" as UC_SCORE
+  usecase "Consulter une estimation de\nprobabilité d'acceptation" as UC_PROBA
+  usecase "Obtenir une explication\ndes critères du score\n(explicabilité)" as UC_EXPL
+  usecase "Configurer les paramètres\nde matching / seuils\n(optionnel)" as UC_CFG
+}
+
+O --> UC_AUTH
+O --> UC_EV
+O --> UC_CAT
+O --> UC_REQ
+O --> UC_SENT
+O --> UC_RANK
+O --> UC_SCORE
+O --> UC_PROBA
+O --> UC_EXPL
+
+P --> UC_AUTH
+P --> UC_PROF
+P --> UC_IN
+
+A --> UC_AUTH
+A --> UC_DASH
+A --> UC_APP
+A --> UC_USERS
+A --> UC_CFG
+
+note bottom of UC_RANK
+  Spécifications et interfaces décrites au chapitre
+  « Conception du module IA » ; le code du moteur
+  (modèle / service) n'est pas encore intégré au dépôt.
+end note
+
+@enduml

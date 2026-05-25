@@ -1,0 +1,31 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+actor "Organisateur" as O
+participant "Frontend\nAngular" as F
+participant "API REST\nSpring Boot" as B
+participant "Base PostgreSQL" as D
+actor "Prestataire" as P
+
+O -> F : Choisit événement + prestataire
+F -> B : POST /api/reservations\n{ eventId, providerUserId }
+B -> D : Vérifie événement,\nprofil approuvé, doublons
+D --> B : OK / erreur métier
+B --> F : 201 ReservationResponse\n(statut EN_ATTENTE)
+F --> O : Confirmation
+
+... quelques instants ...
+
+P -> F : Consulte demandes reçues
+F -> B : GET /api/reservations/received
+B -> D : Liste par providerUserId
+D --> B
+B --> F : Liste des réservations
+
+P -> F : Accepte ou refuse
+F -> B : PATCH .../accept ou .../reject
+B -> D : Met à jour statut
+B --> F : ReservationResponse
+
+@enduml

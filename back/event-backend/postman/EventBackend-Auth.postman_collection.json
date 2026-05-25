@@ -291,6 +291,30 @@
       }
     },
     {
+      "name": "Recommendations for event (ORGANISATEUR)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/recommendations/events/{{eventId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "recommendations",
+            "events",
+            "{{eventId}}"
+          ]
+        }
+      }
+    },
+    {
       "name": "Update Event",
       "request": {
         "method": "PUT",
@@ -350,6 +374,181 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Delete event returns 204\", function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register Provider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Provider User\",\n  \"email\": \"{{providerEmail}}\",\n  \"password\": \"{{providerPassword}}\",\n  \"role\": \"PRESTATAIRE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Login Provider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{providerEmail}}\",\n  \"password\": \"{{providerPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Provider login returns 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "if (body.token) {",
+              "    pm.collectionVariables.set(\"jwtToken\", body.token);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upsert Provider Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"businessName\": \"Salle Royale\",\n  \"minCapacity\": 50,\n  \"maxCapacity\": 300,\n  \"acceptedEventTypes\": [\"MARIAGE\", \"CONFERENCE\", \"ANNIVERSAIRE\"],\n  \"minimumPrice\": 5000,\n  \"availabilityNotes\": \"Disponible weekends et jours feries\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/providers/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "providers",
+            "me"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Upsert provider profile returns 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get My Provider Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/providers/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "providers",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete My Provider Profile",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/providers/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "providers",
+            "me"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Delete provider profile returns 204\", function () {",
               "    pm.response.to.have.status(204);",
               "});"
             ]

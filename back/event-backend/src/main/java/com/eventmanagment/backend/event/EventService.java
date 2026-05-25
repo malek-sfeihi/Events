@@ -3,12 +3,14 @@ package com.eventmanagment.backend.event;
 import com.eventmanagment.backend.common.ResourceNotFoundException;
 import com.eventmanagment.backend.event.dto.EventResponse;
 import com.eventmanagment.backend.event.dto.UpsertEventRequest;
+import com.eventmanagment.backend.media.LocalMediaStorageService;
 import com.eventmanagment.backend.user.Role;
 import com.eventmanagment.backend.user.User;
 import com.eventmanagment.backend.user.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final LocalMediaStorageService mediaStorageService;
 
     public EventResponse create(String userEmail, UpsertEventRequest request) {
         User organizer = getOrganizer(userEmail);
@@ -69,6 +72,16 @@ public class EventService {
         eventRepository.delete(event);
     }
 
+    public EventResponse uploadPhoto(String userEmail, Long eventId, MultipartFile file) {
+        User organizer = getOrganizer(userEmail);
+        Event event = findOwnedEvent(organizer.getId(), eventId);
+        String photoUrl = mediaStorageService.storeImage(file, "events");
+        event.setPhotoUrl(photoUrl);
+        event.setUpdatedAt(Instant.now());
+        Event saved = eventRepository.save(event);
+        return toResponse(saved);
+    }
+
     private User getOrganizer(String userEmail) {
         User user = userRepository.findByEmail(userEmail.toLowerCase())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -94,7 +107,8 @@ public class EventService {
                 event.getEventDate(),
                 event.getParticipantCount(),
                 event.getBudget(),
-                event.getPreferences()
+                event.getPreferences(),
+                event.getPhotoUrl()
         );
     }
 }

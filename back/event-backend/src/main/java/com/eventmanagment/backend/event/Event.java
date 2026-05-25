@@ -44,6 +44,9 @@ public class Event {
     @Column(length = 1000)
     private String preferences;
 
+    @Column(length = 400)
+    private String photoUrl;
+
     @Column(nullable = false)
     private Instant createdAt;
 

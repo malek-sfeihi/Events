@@ -1,0 +1,60 @@
+<section class="panel motion-fade">
+  <h1 class="panel-title">Profil prestataire</h1>
+  <p class="panel-lead">
+    Visible dans le catalogue une fois approuvé par un administrateur. Vous pouvez enregistrer avant approbation.
+  </p>
+
+  @if (loading()) {
+    <p class="muted">Chargement…</p>
+  } @else {
+    @if (approved()) {
+      <p class="panel-success">Votre profil est <strong>approuvé</strong>.</p>
+    } @else if (hasExistingProfile()) {
+      <p class="panel-warn">Profil en attente d’approbation.</p>
+    }
+
+    @if (error()) {
+      <p class="panel-error" role="alert">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="panel-success">{{ success() }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <label class="field-inline field-span-2">
+          <span>Nom commercial</span>
+          <input type="text" formControlName="businessName" />
+        </label>
+        <label class="field-inline">
+          <span>Capacité min.</span>
+          <input type="number" formControlName="minCapacity" min="1" />
+        </label>
+        <label class="field-inline">
+          <span>Capacité max.</span>
+          <input type="number" formControlName="maxCapacity" min="1" />
+        </label>
+        <label class="field-inline field-span-2">
+          <span>Types d’événements acceptés (virgules)</span>
+          <input type="text" formControlName="acceptedEventTypesText" placeholder="Mariage, Séminaire, …" />
+        </label>
+        <label class="field-inline">
+          <span>Prix minimum (DT)</span>
+          <input type="number" formControlName="minimumPrice" min="0.01" step="0.01" />
+        </label>
+      </div>
+      <label class="field-inline field-block">
+        <span>Disponibilités / notes</span>
+        <textarea formControlName="availabilityNotes" rows="3"></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-accent" [disabled]="saving()">Enregistrer</button>
+        @if (hasExistingProfile()) {
+          <button type="button" class="btn btn-ghost danger-text" (click)="deleteProfile()">
+            Supprimer le profil
+          </button>
+        }
+      </div>
+    </form>
+  }
+</section>

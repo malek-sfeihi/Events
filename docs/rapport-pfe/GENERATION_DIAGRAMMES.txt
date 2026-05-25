@@ -1,0 +1,27 @@
+Génération des figures PNG à partir des fichiers PlantUML (.puml)
+================================================================
+
+Prérequis : Java installé (java -version).
+
+Depuis le dossier docs/rapport-pfe :
+
+  java -jar tools\plantuml.jar -charset UTF-8 -tpng -o figures uml\cas_utilisation.puml
+  java -jar tools\plantuml.jar -charset UTF-8 -tpng -o figures uml\classes_metier.puml
+  java -jar tools\plantuml.jar -charset UTF-8 -tpng -o figures uml\sequence_demande_reservation.puml
+  java -jar tools\plantuml.jar -charset UTF-8 -tpng -o figures uml\sequence_matching_ia.puml
+
+Ou en une fois (PowerShell) :
+
+  Get-ChildItem uml\*.puml | ForEach-Object {
+    java -jar tools\plantuml.jar -charset UTF-8 -tpng -o figures $_.FullName
+  }
+
+Les fichiers PNG sont écrits dans figures\ et sont inclus par rapport_pfe.tex.
+
+Jar PlantUML : si absent, télécharger depuis https://github.com/plantuml/plantuml/releases
+(version utilisée pour le dépôt : plantuml-1.2024.7.jar dans tools\).
+
+Compilation PDF (pdflatex recommandé, 2 passes pour la table des matières) :
+
+  pdflatex rapport_pfe.tex
+  pdflatex rapport_pfe.tex
