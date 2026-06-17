@@ -20,6 +20,15 @@ Le backend Java **ne recalcule pas** le score lorsque `recommendation.python.ena
 
 Configuration : `back/event-backend/src/main/resources/application.yml` (`recommendation.python.*`).
 
-## Évolution ML
+## Évolution ML (pas à pas)
 
-La logique dans `scoring.py` peut être remplacée par un modèle **scikit-learn**, **PyTorch**, etc., en conservant le contrat `ScoreRequest` / liste de `ScoreItem`. Spring et Angular restent inchangés.
+| Étape | Statut | Contenu |
+|-------|--------|---------|
+| 1 | OK | Problème : prédire acceptation à partir de l'historique |
+| 2 | OK | `python-service/scripts/export_training_data.py` → `data/reservations_training.csv` |
+| 3 | À venir | Feature engineering / entraînement |
+| 4–6 | À venir | Modèle, intégration `scoring.py`, évaluation |
+
+Voir `python-service/data/README.md` pour lancer l'export.
+
+La logique dans `scoring.py` sera complétée par un modèle **scikit-learn** en conservant le contrat `ScoreRequest` / liste de `ScoreItem`. Spring et Angular restent inchangés.
