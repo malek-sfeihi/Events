@@ -27,9 +27,20 @@ export class AdminService {
     return this.http.get<AdminUserSummaryDto[]>(`${this.base}/users`);
   }
 
+  catalogProviders(): Observable<AdminPendingProviderDto[]> {
+    return this.http.get<AdminPendingProviderDto[]>(`${this.base}/providers/approved`);
+  }
+
   approveProvider(providerUserId: number): Observable<ProviderProfileDto> {
     return this.http.patch<ProviderProfileDto>(
       `${this.base}/providers/${providerUserId}/approve`,
+      {},
+    );
+  }
+
+  revokeProvider(providerUserId: number): Observable<ProviderProfileDto> {
+    return this.http.patch<ProviderProfileDto>(
+      `${this.base}/providers/${providerUserId}/revoke`,
       {},
     );
   }

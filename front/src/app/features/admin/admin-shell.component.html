@@ -1,4 +1,33 @@
-<app-header-bar subtitle="Administration" />
-<div class="page motion-fade">
-  <router-outlet />
+<div class="app-layout">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      EventSpace
+    </div>
+
+    <p class="sidebar-role-tag">Administration</p>
+
+    <nav class="sidebar-nav">
+      <a class="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        Tableau de bord
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="app-main">
+    <app-header-bar subtitle="Administration" />
+    <div class="page motion-fade">
+      <router-outlet />
+    </div>
+  </main>
 </div>

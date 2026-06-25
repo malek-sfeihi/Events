@@ -11,5 +11,6 @@ public record ProviderProfileResponse(
         Set<String> acceptedEventTypes,
         BigDecimal minimumPrice,
         String availabilityNotes,
-        boolean approved
+        boolean approved,
+        String logoUrl
 ) {}

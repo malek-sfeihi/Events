@@ -64,6 +64,21 @@ public class AdminService {
                 .toList();
     }
 
+    public List<AdminPendingProviderResponse> listApprovedProviders() {
+        return providerProfileRepository.findByApproved(true).stream()
+                .map(this::toPendingRow)
+                .toList();
+    }
+
+    @Transactional
+    public ProviderProfileResponse revokeProvider(Long providerUserId) {
+        ProviderProfile profile = providerProfileRepository.findByProviderUserId(providerUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
+        profile.setApproved(false);
+        providerProfileRepository.save(profile);
+        return toProfileResponse(profile);
+    }
+
     @Transactional
     public ProviderProfileResponse approveProvider(Long providerUserId) {
         ProviderProfile profile = providerProfileRepository.findByProviderUserId(providerUserId)
@@ -164,7 +179,8 @@ public class AdminService {
     }
 
     private ProviderProfileResponse toProfileResponse(ProviderProfile profile) {
-        return new ProviderProfileResponse(
+        return
+                new ProviderProfileResponse(
                 profile.getId(),
                 profile.getBusinessName(),
                 profile.getMinCapacity(),
@@ -172,6 +188,7 @@ public class AdminService {
                 profile.getAcceptedEventTypes(),
                 profile.getMinimumPrice(),
                 profile.getAvailabilityNotes(),
-                profile.isApproved());
+                profile.isApproved(),
+                profile.getLogoUrl());
     }
 }

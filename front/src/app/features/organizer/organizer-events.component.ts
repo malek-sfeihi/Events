@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { of, switchMap } from 'rxjs';
 
 import type { EventDto } from '../../core/api/api.models';
+import { EVENT_TYPES } from '../../core/constants/event-types';
 import { readApiError } from '../../core/api/error.util';
 import { EventService } from '../../core/api/event.service';
 import { environment } from '../../../environments/environment';
@@ -18,17 +19,20 @@ export class OrganizerEventsComponent implements OnInit {
   private readonly eventsApi = inject(EventService);
   private readonly fb = inject(FormBuilder);
 
+  readonly EVENT_TYPES = EVENT_TYPES;
+
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly events = signal<EventDto[]>([]);
   readonly editingId = signal<number | null>(null);
+  readonly photoError = signal<string | null>(null);
   private eventPhotoFile: File | null = null;
 
   readonly today = new Date().toISOString().slice(0, 10);
 
   readonly form = this.fb.nonNullable.group({
-    eventType: ['', [Validators.required, Validators.minLength(2)]],
+    eventType: ['', Validators.required],
     eventDate: ['', Validators.required],
     participantCount: [10, [Validators.required, Validators.min(1)]],
     budget: [1000, [Validators.required, Validators.min(0.01)]],
@@ -37,7 +41,20 @@ export class OrganizerEventsComponent implements OnInit {
 
   onEventPhotoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.eventPhotoFile = input.files?.[0] ?? null;
+    const file = input.files?.[0] ?? null;
+    this.photoError.set(null);
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.photoError.set('La photo ne doit pas dépasser 5 Mo.');
+        input.value = '';
+        return;
+      }
+    }
+    this.eventPhotoFile = file;
+  }
+
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).style.display = 'none';
   }
 
   photoSrc(path: string | null): string | null {

@@ -1,20 +1,11 @@
-.cell-actions-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
-  align-items: center;
-}
-
+/* ─── Admin hub banner ─── */
 .admin-hub {
-  margin-bottom: 2rem;
-  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
-  background: linear-gradient(
-    125deg,
-    color-mix(in srgb, var(--accent-soft) 55%, var(--surface)),
-    var(--surface)
-  );
+  border-left: 4px solid var(--accent);
+  background: linear-gradient(125deg, color-mix(in srgb, var(--accent-soft) 60%, var(--surface)) 0%, var(--surface) 60%);
   box-shadow: var(--shadow);
 }
 
@@ -22,52 +13,83 @@
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 700;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.25rem;
   letter-spacing: -0.03em;
 }
 
 .admin-hub-lead {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 0.88rem;
   color: var(--muted);
-  max-width: 40rem;
 }
 
-.stat-grid--rich {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-  gap: 0.85rem;
+/* ─── Tabs nav ─── */
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
 }
 
-.stat-card-rich {
-  position: relative;
-  padding: 1rem 1rem 1rem 2.85rem;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  box-shadow: var(--shadow);
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
 }
 
-.stat-card-rich .stat-icon {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1.5rem;
-  height: 1.5rem;
-  opacity: 0.85;
+.admin-tab:hover { color: var(--text); }
+
+.admin-tab.is-active {
   color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
-.stat-card-rich .stat-value {
-  font-size: 1.65rem;
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--warn);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
 }
 
-.stat-card-rich .stat-label {
-  font-size: 0.68rem;
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 600;
 }
 
+/* ─── Tab panel ─── */
+.tab-panel {
+  padding: 0;
+}
+
+/* ─── Section head ─── */
 .section-head {
   display: flex;
   flex-wrap: wrap;
@@ -77,16 +99,113 @@
   margin-bottom: 1rem;
 }
 
-.section-head h2 {
-  margin: 0;
+.section-head h2 { margin: 0; }
+
+.section-desc {
+  margin: -0.5rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
+/* ─── Badge neutral ─── */
+.badge-neutral {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* ─── Stat grid rich ─── */
+.stat-grid--rich {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.875rem;
+}
+
+.stat-card-rich {
+  position: relative;
+  padding: 1.1rem 1rem 1rem 3rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.stat-card-rich:hover { box-shadow: var(--shadow-lg); }
+
+.stat-card-rich::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--accent);
+  border-radius: 4px 0 0 4px;
+}
+
+.stat-card-rich:nth-child(2n)::after { background: var(--accent-2); }
+.stat-card-rich:nth-child(3n)::after { background: var(--warn); }
+.stat-card-rich:nth-child(5n)::after { background: var(--accent-light); }
+.stat-card-rich:nth-child(7n)::after { background: var(--danger); }
+
+.stat-card-rich .stat-icon {
+  position: absolute;
+  left: 0.75rem; top: 50%;
+  transform: translateY(-50%);
+  width: 1.5rem; height: 1.5rem;
+  color: var(--accent);
+  opacity: 0.70;
+}
+
+.stat-card-rich:nth-child(2n) .stat-icon { color: var(--accent-2); }
+.stat-card-rich:nth-child(3n) .stat-icon { color: var(--warn); }
+
+.stat-card-rich .stat-value { font-size: 1.7rem; letter-spacing: -0.04em; }
+.stat-card-rich .stat-label { font-size: 0.66rem; }
+
+/* ─── Pending / catalog cards ─── */
+.pending-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pending-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.pending-card-info { flex: 1; min-width: 0; }
+.pending-profile { margin: 0.2rem 0 0.1rem; font-size: 0.85rem; color: var(--muted); }
+
+/* ─── Tag list (inline) ─── */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.tag-pill--sm {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
+}
+
+/* ─── Empty state ─── */
 .empty-state {
-  padding: 2rem 1.25rem;
+  padding: 2.5rem 1.25rem;
   text-align: center;
   border-radius: var(--radius-lg);
-  border: 2px dashed color-mix(in srgb, var(--accent) 28%, var(--line));
-  background: color-mix(in srgb, var(--surface) 94%, var(--accent-soft));
+  border: 2px dashed var(--line);
+  background: var(--surface-2);
 }
 
 .empty-state p {
@@ -94,37 +213,26 @@
   color: var(--muted);
   max-width: 26rem;
   margin-inline: auto;
-  line-height: 1.55;
+  line-height: 1.6;
+  font-size: 0.9rem;
 }
 
-.users-toolbar {
-  margin-bottom: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
+/* ─── Role badges ─── */
 .role-badge {
   display: inline-block;
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
-  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
-.role-badge--org {
-  background: color-mix(in srgb, var(--accent-2) 22%, transparent);
-}
+.role-badge--org   { background: var(--accent-2-soft);   color: var(--accent-2-dark); }
+.role-badge--presta{ background: var(--accent-soft);      color: var(--accent-dark); }
+.role-badge--admin { background: color-mix(in srgb, var(--warn) 18%, transparent); color: color-mix(in srgb, var(--warn) 90%, #000); }
 
-.role-badge--presta {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-.role-badge--admin {
-  background: color-mix(in srgb, #6b5b4a 20%, transparent);
-}
-
+/* ─── Status dot ─── */
 .status-dot {
   display: inline-flex;
   align-items: center;
@@ -134,30 +242,36 @@
 
 .status-dot::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--accent-2);
+  flex-shrink: 0;
 }
 
-.status-dot.is-off::before {
-  background: color-mix(in srgb, var(--accent) 70%, #888);
+.status-dot.is-off::before { background: var(--danger); }
+
+/* ─── Cell actions ─── */
+.cell-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
 }
 
+/* ─── Manual box ─── */
 .manual-box {
-  margin-top: 0.5rem;
-  padding: 1rem 1.15rem;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--bg) 80%, var(--surface));
+  background: var(--surface-2);
 }
 
 .manual-box summary {
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
-.manual-box[open] summary {
-  margin-bottom: 0.75rem;
-}
+.manual-box[open] summary { margin-bottom: 0.75rem; }

@@ -49,6 +49,7 @@ export interface ProviderCatalogItem {
   acceptedEventTypes: string[];
   minimumPrice: number;
   availabilityNotes: string | null;
+  logoUrl: string | null;
 }
 
 export interface ProviderProfileDto {
@@ -60,6 +61,7 @@ export interface ProviderProfileDto {
   minimumPrice: number;
   availabilityNotes: string | null;
   approved: boolean;
+  logoUrl: string | null;
 }
 
 export interface UpsertProviderProfilePayload {

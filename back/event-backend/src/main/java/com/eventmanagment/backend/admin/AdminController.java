@@ -40,9 +40,19 @@ public class AdminController {
         return adminService.listPendingProviders();
     }
 
+    @GetMapping("/providers/approved")
+    public List<AdminPendingProviderResponse> approvedProviders() {
+        return adminService.listApprovedProviders();
+    }
+
     @PatchMapping("/providers/{providerUserId}/approve")
     public ProviderProfileResponse approve(@PathVariable Long providerUserId) {
         return adminService.approveProvider(providerUserId);
+    }
+
+    @PatchMapping("/providers/{providerUserId}/revoke")
+    public ProviderProfileResponse revoke(@PathVariable Long providerUserId) {
+        return adminService.revokeProvider(providerUserId);
     }
 
     @PatchMapping("/users/{userId}/enabled")

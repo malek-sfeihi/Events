@@ -1,67 +1,136 @@
 <section class="panel motion-fade">
-  <h1 class="panel-title">Recommandations intelligentes</h1>
+  <h1 class="panel-title">Recommandations IA</h1>
   <p class="panel-lead">
-    Classement des prestataires validés selon l’adéquation avec l’un de vos événements : type, capacité, budget et historique
-    d’acceptation. Les probabilités sont indicatives et accompagnées d’un court texte explicatif.
+    Classement des prestataires validés selon l'adéquation avec votre événement.
+    Le moteur hybride combine scoring par règles métier (type, capacité, budget)
+    et données historiques d'acceptation.
   </p>
+
+  <!-- Bandeau moteur IA -->
+  <div class="ai-info-card">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+    </svg>
+    <span>Moteur <strong>EventMatcher IA</strong> — scoring hybride pondéré (type ×30 %, capacité ×25 %, budget ×25 %, historique ×20 %)</span>
+  </div>
 
   @if (error()) {
     <p class="panel-error" role="alert">{{ error() }}</p>
   }
 
+  <!-- Sélecteur d'événement -->
   <div class="toolbar">
     <label class="field-inline grow">
-      <span>Événement</span>
+      <span>Événement à analyser</span>
       <select
         name="eventId"
         [(ngModel)]="selectedEventId"
         (ngModelChange)="onEventChange()"
         [disabled]="loadingEvents() || events().length === 0"
       >
-        <option [ngValue]="null">— Choisir —</option>
+        <option [ngValue]="null">— Choisir un événement —</option>
         @for (e of events(); track e.id) {
           <option [ngValue]="e.id">
-            {{ e.eventType }} — {{ e.eventDate }} ({{ e.participantCount }} pers., {{ e.budget | number : '1.2-2' }} DT)
+            {{ e.eventType }} · {{ e.eventDate }} · {{ e.participantCount }} pers. · {{ e.budget | number:'1.0-0' }} DT
           </option>
         }
       </select>
     </label>
   </div>
 
+  <!-- États -->
   @if (loadingEvents()) {
-    <p class="muted">Chargement des événements…</p>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement des événements…</p>
+    </div>
   } @else if (events().length === 0) {
-    <p class="muted">Créez d’abord un événement pour obtenir des recommandations.</p>
+    <div class="empty-banner">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <path d="M16 2v4M8 2v4M3 10h18"/>
+      </svg>
+      <p>Créez d'abord un événement pour lancer l'analyse IA.</p>
+    </div>
   } @else if (selectedEventId === null) {
-    <p class="muted">Sélectionnez un événement pour afficher le classement.</p>
+    <div class="empty-banner">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+      </svg>
+      <p>Sélectionnez un événement ci-dessus pour lancer l'analyse IA et obtenir un classement personnalisé des prestataires.</p>
+    </div>
   } @else if (loadingScores()) {
-    <p class="muted">Calcul du classement…</p>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Analyse IA en cours — calcul du classement…</p>
+    </div>
   } @else if (scores().length === 0) {
-    <p class="muted">Aucun prestataire éligible pour le moment.</p>
+    <div class="empty-banner">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4M12 16h.01"/>
+      </svg>
+      <p>Aucun prestataire approuvé n'est éligible pour cet événement.</p>
+    </div>
   } @else {
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Rang</th>
-            <th>Prestataire</th>
-            <th>Score</th>
-            <th>P prob.</th>
-            <th>Explication</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of scores(); track r.providerUserId; let i = $index) {
-            <tr>
-              <td>{{ i + 1 }}</td>
-              <td>{{ r.businessName }}</td>
-              <td>{{ r.compatibilityScore }} / 100</td>
-              <td>{{ r.acceptanceProbability | number : '1.0-2' }}</td>
-              <td class="cell-explain">{{ r.explanation }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <!-- En-tête résultats -->
+    <p class="reco-header">
+      <strong>{{ scores().length }}</strong> prestataire{{ scores().length > 1 ? 's' : '' }} analysé{{ scores().length > 1 ? 's' : '' }} et classé{{ scores().length > 1 ? 's' : '' }} par score de compatibilité
+    </p>
+
+    <!-- Cartes de score -->
+    <div class="score-cards">
+      @for (r of scores(); track r.providerUserId; let i = $index) {
+        <div
+          class="score-card"
+          [class.score-card--top]="i === 0"
+          [class.score-card--second]="i === 1"
+          [class.score-card--third]="i === 2"
+        >
+          <!-- Rang -->
+          <div class="score-card-rank" [attr.aria-label]="'Rang ' + (i + 1)">
+            @if (i === 0) { <span aria-hidden="true">🥇</span> }
+            @else if (i === 1) { <span aria-hidden="true">🥈</span> }
+            @else if (i === 2) { <span aria-hidden="true">🥉</span> }
+            @else { <span class="rank-num">{{ i + 1 }}</span> }
+          </div>
+
+          <!-- Corps -->
+          <div class="score-card-body">
+            <div class="score-card-head">
+              <h3 class="score-card-name">{{ r.businessName }}</h3>
+              <span
+                class="score-prob"
+                [class.prob-high]="r.acceptanceProbability >= 0.70"
+                [class.prob-med]="r.acceptanceProbability >= 0.45 && r.acceptanceProbability < 0.70"
+                [class.prob-low]="r.acceptanceProbability < 0.45"
+              >
+                P(acceptation) {{ (r.acceptanceProbability * 100) | number:'1.0-0' }}%
+              </span>
+            </div>
+
+            <!-- Barre de score -->
+            <div class="score-bar-wrap">
+              <div class="score-bar-label">
+                <span>Score de compatibilité</span>
+                <span class="score-num">{{ r.compatibilityScore }}&nbsp;/&nbsp;100</span>
+              </div>
+              <div class="score-bar-track" role="progressbar" [attr.aria-valuenow]="r.compatibilityScore" aria-valuemin="0" aria-valuemax="100">
+                <div
+                  class="score-bar-fill"
+                  [style.width.%]="r.compatibilityScore"
+                  [class.fill-high]="r.compatibilityScore >= 70"
+                  [class.fill-med]="r.compatibilityScore >= 45 && r.compatibilityScore < 70"
+                  [class.fill-low]="r.compatibilityScore < 45"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Explication -->
+            <p class="score-explain">{{ r.explanation }}</p>
+          </div>
+        </div>
+      }
     </div>
   }
 </section>

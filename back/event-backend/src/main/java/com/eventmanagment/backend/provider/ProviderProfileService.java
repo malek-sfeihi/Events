@@ -1,6 +1,7 @@
 package com.eventmanagment.backend.provider;
 
 import com.eventmanagment.backend.common.ResourceNotFoundException;
+import com.eventmanagment.backend.media.LocalMediaStorageService;
 import com.eventmanagment.backend.provider.dto.ProviderProfileResponse;
 import com.eventmanagment.backend.provider.dto.UpsertProviderProfileRequest;
 import com.eventmanagment.backend.user.Role;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class ProviderProfileService {
 
     private final ProviderProfileRepository providerProfileRepository;
     private final UserRepository userRepository;
+    private final LocalMediaStorageService mediaStorageService;
 
     public ProviderProfileResponse upsert(String userEmail, UpsertProviderProfileRequest request) {
         User provider = getProvider(userEmail);
@@ -52,6 +55,17 @@ public class ProviderProfileService {
         return toResponse(profile);
     }
 
+    public ProviderProfileResponse uploadLogo(String userEmail, MultipartFile file) {
+        User provider = getProvider(userEmail);
+        ProviderProfile profile = providerProfileRepository.findByProviderUserId(provider.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found"));
+        String logoUrl = mediaStorageService.storeImage(file, "providers");
+        profile.setLogoUrl(logoUrl);
+        profile.setUpdatedAt(Instant.now());
+        ProviderProfile saved = providerProfileRepository.save(profile);
+        return toResponse(saved);
+    }
+
     public void deleteMine(String userEmail) {
         User provider = getProvider(userEmail);
         ProviderProfile profile = providerProfileRepository.findByProviderUserId(provider.getId())
@@ -77,7 +91,8 @@ public class ProviderProfileService {
                 profile.getAcceptedEventTypes(),
                 profile.getMinimumPrice(),
                 profile.getAvailabilityNotes(),
-                profile.isApproved()
+                profile.isApproved(),
+                profile.getLogoUrl()
         );
     }
 }

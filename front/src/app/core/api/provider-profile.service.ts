@@ -18,6 +18,12 @@ export class ProviderProfileService {
     return this.http.put<ProviderProfileDto>(this.base, payload);
   }
 
+  uploadLogo(file: File): Observable<ProviderProfileDto> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<ProviderProfileDto>(`${this.base}/logo`, fd);
+  }
+
   deleteMine(): Observable<void> {
     return this.http.delete<void>(this.base);
   }

@@ -3,10 +3,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import type { EventDto, ProviderCatalogItem } from '../../core/api/api.models';
+import { EVENT_TYPES } from '../../core/constants/event-types';
 import { readApiError } from '../../core/api/error.util';
 import { CatalogService } from '../../core/api/catalog.service';
 import { EventService } from '../../core/api/event.service';
 import { ReservationService } from '../../core/api/reservation.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-organizer-catalog',
@@ -19,7 +21,8 @@ export class OrganizerCatalogComponent implements OnInit {
   private readonly eventsApi = inject(EventService);
   private readonly reservationsApi = inject(ReservationService);
 
-  /** Fichiers servis par Angular depuis `public/images/landing/` (évite liens Unsplash bloqués en local). */
+  readonly EVENT_TYPES = EVENT_TYPES;
+
   private readonly coverUrls = [
     '/images/landing/cover-1.jpg',
     '/images/landing/cover-2.jpg',
@@ -78,8 +81,11 @@ export class OrganizerCatalogComponent implements OnInit {
     this.selectedEventId.set(null);
   }
 
-  coverUrl(providerUserId: number): string {
-    const i = Math.abs(providerUserId) % this.coverUrls.length;
+  coverUrl(p: ProviderCatalogItem): string {
+    if (p.logoUrl) {
+      return p.logoUrl.startsWith('http') ? p.logoUrl : `${environment.apiBaseUrl}${p.logoUrl}`;
+    }
+    const i = Math.abs(p.providerUserId) % this.coverUrls.length;
     return this.coverUrls[i];
   }
 

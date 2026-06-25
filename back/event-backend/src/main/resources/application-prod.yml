@@ -6,4 +6,15 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000
+
+recommendation:
+  python:
+    enabled: true
+    base-url: ${AI_SERVICE_URL}
+    score-path: /api/v1/recommendations/score

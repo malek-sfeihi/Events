@@ -7,8 +7,13 @@
 
   <div class="toolbar">
     <label class="field-inline grow">
-      <span>Filtrer (type d’événement)</span>
-      <input type="text" [(ngModel)]="filterType" placeholder="ex. Mariage" name="filterType" />
+      <span>Filtrer par type d’événement</span>
+      <select [(ngModel)]="filterType" name="filterType">
+        <option value="">Tous les types</option>
+        @for (t of EVENT_TYPES; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
     </label>
     <button type="button" class="btn btn-ghost" (click)="applyFilter()" [disabled]="loading()">Appliquer</button>
   </div>
@@ -27,7 +32,7 @@
         <li class="catalog-card catalog-card--visual">
           <div class="catalog-card-cover">
             <img
-              [src]="coverUrl(p.providerUserId)"
+              [src]="coverUrl(p)"
               alt=""
               width="800"
               height="450"

@@ -10,5 +10,6 @@ public record ProviderCatalogItem(
         Integer maxCapacity,
         Set<String> acceptedEventTypes,
         BigDecimal minimumPrice,
-        String availabilityNotes
+        String availabilityNotes,
+        String logoUrl
 ) {}

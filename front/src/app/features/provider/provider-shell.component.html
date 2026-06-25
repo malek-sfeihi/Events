@@ -1,8 +1,41 @@
-<app-header-bar subtitle="Prestataire" />
-<nav class="subnav">
-  <a routerLink="profile" routerLinkActive="active">Mon profil</a>
-  <a routerLink="requests" routerLinkActive="active">Demandes reçues</a>
-</nav>
-<div class="page motion-fade">
-  <router-outlet />
+<div class="app-layout">
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <a routerLink="/" class="sidebar-brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      EventSpace
+    </a>
+
+    <p class="sidebar-role-tag">Espace Prestataire</p>
+
+    <nav class="sidebar-nav">
+      <a routerLink="profile" routerLinkActive="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Mon profil
+      </a>
+      <a routerLink="requests" routerLinkActive="active">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 8h1a4 4 0 010 8h-1"/>
+          <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+          <line x1="6" y1="1" x2="6" y2="4"/>
+          <line x1="10" y1="1" x2="10" y2="4"/>
+          <line x1="14" y1="1" x2="14" y2="4"/>
+        </svg>
+        Demandes reçues
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="app-main">
+    <app-header-bar subtitle="Prestataire" />
+    <div class="page motion-fade">
+      <router-outlet />
+    </div>
+  </main>
 </div>

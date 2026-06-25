@@ -1,16 +1,28 @@
 <section class="panel motion-fade">
   <h1 class="panel-title">Profil prestataire</h1>
   <p class="panel-lead">
-    Visible dans le catalogue une fois approuvé par un administrateur. Vous pouvez enregistrer avant approbation.
+    Visible dans le catalogue une fois approuvé par un administrateur.
+    Vous pouvez enregistrer votre profil avant l'approbation.
   </p>
 
   @if (loading()) {
-    <p class="muted">Chargement…</p>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement…</p>
+    </div>
   } @else {
     @if (approved()) {
-      <p class="panel-success">Votre profil est <strong>approuvé</strong>.</p>
+      <p class="panel-success">
+        ✓ Votre profil est <strong>approuvé</strong> et visible dans le catalogue.
+      </p>
     } @else if (hasExistingProfile()) {
-      <p class="panel-warn">Profil en attente d’approbation.</p>
+      <p class="panel-warn">
+        ⏳ Profil enregistré — en attente d'approbation par un administrateur.
+      </p>
+    } @else {
+      <p class="panel-warn">
+        Vous n'avez pas encore de profil. Remplissez le formulaire ci-dessous pour rejoindre le catalogue.
+      </p>
     }
 
     @if (error()) {
@@ -22,33 +34,110 @@
 
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="form-grid">
+        <!-- Nom commercial -->
         <label class="field-inline field-span-2">
           <span>Nom commercial</span>
-          <input type="text" formControlName="businessName" />
+          <input
+            type="text"
+            formControlName="businessName"
+            placeholder="ex. Traiteur Martin, Studio Lumière…"
+            [class.field-input-error]="form.controls.businessName.invalid && form.controls.businessName.touched"
+          />
+          @if (form.controls.businessName.invalid && form.controls.businessName.touched) {
+            <span class="field-error">Nom commercial requis (min. 2 caractères).</span>
+          }
         </label>
+
+        <!-- Capacité min -->
         <label class="field-inline">
-          <span>Capacité min.</span>
-          <input type="number" formControlName="minCapacity" min="1" />
+          <span>Capacité min. (pers.)</span>
+          <input
+            type="number"
+            formControlName="minCapacity"
+            min="1"
+            [class.field-input-error]="form.controls.minCapacity.invalid && form.controls.minCapacity.touched"
+          />
+          @if (form.controls.minCapacity.invalid && form.controls.minCapacity.touched) {
+            <span class="field-error">Minimum 1 personne.</span>
+          }
         </label>
+
+        <!-- Capacité max -->
         <label class="field-inline">
-          <span>Capacité max.</span>
-          <input type="number" formControlName="maxCapacity" min="1" />
+          <span>Capacité max. (pers.)</span>
+          <input
+            type="number"
+            formControlName="maxCapacity"
+            min="1"
+            [class.field-input-error]="form.controls.maxCapacity.invalid && form.controls.maxCapacity.touched"
+          />
+          @if (form.controls.maxCapacity.invalid && form.controls.maxCapacity.touched) {
+            <span class="field-error">Doit être ≥ capacité min.</span>
+          }
         </label>
-        <label class="field-inline field-span-2">
-          <span>Types d’événements acceptés (virgules)</span>
-          <input type="text" formControlName="acceptedEventTypesText" placeholder="Mariage, Séminaire, …" />
-        </label>
+
+        <!-- Prix minimum -->
         <label class="field-inline">
           <span>Prix minimum (DT)</span>
-          <input type="number" formControlName="minimumPrice" min="0.01" step="0.01" />
+          <input
+            type="number"
+            formControlName="minimumPrice"
+            min="0.01"
+            step="0.01"
+            placeholder="ex. 500"
+            [class.field-input-error]="form.controls.minimumPrice.invalid && form.controls.minimumPrice.touched"
+          />
+          @if (form.controls.minimumPrice.invalid && form.controls.minimumPrice.touched) {
+            <span class="field-error">Prix minimum requis (supérieur à 0).</span>
+          }
         </label>
       </div>
+
+      <!-- Types d'événements acceptés -->
+      <div class="field-block" style="margin-bottom:1.25rem">
+        <p class="field-label">Types d'événements acceptés <span class="field-hint">(sélectionnez au moins un)</span></p>
+        <div class="checkbox-grid">
+          @for (type of EVENT_TYPES; track type) {
+            <label class="checkbox-pill" [class.checkbox-pill--on]="isTypeSelected(type)">
+              <input
+                type="checkbox"
+                [checked]="isTypeSelected(type)"
+                (change)="toggleType(type)"
+              />
+              {{ type }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Notes de disponibilité -->
       <label class="field-inline field-block">
-        <span>Disponibilités / notes</span>
-        <textarea formControlName="availabilityNotes" rows="3"></textarea>
+        <span>Disponibilités / notes <span style="font-weight:400;text-transform:none">(optionnel)</span></span>
+        <textarea
+          formControlName="availabilityNotes"
+          rows="3"
+          placeholder="Horaires, conditions particulières, matériel fourni…"
+        ></textarea>
       </label>
+
+      <!-- Logo commercial -->
+      <div class="field-block" style="margin-bottom:1.25rem">
+        <p class="field-label">Logo commercial <span class="field-hint">(optionnel · JPG/PNG/WEBP · max 5 Mo)</span></p>
+        @if (logoPreview()) {
+          <img [src]="logoPreview()" alt="Aperçu logo" class="logo-preview" />
+        } @else if (currentLogoUrl()) {
+          <img [src]="logoSrc(currentLogoUrl()!)" alt="Logo actuel" class="logo-preview" />
+        }
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onLogoSelected($event)" />
+        @if (logoError()) {
+          <span class="field-error">{{ logoError() }}</span>
+        }
+      </div>
+
       <div class="form-actions">
-        <button type="submit" class="btn btn-accent" [disabled]="saving()">Enregistrer</button>
+        <button type="submit" class="btn btn-accent" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement…' : 'Enregistrer le profil' }}
+        </button>
         @if (hasExistingProfile()) {
           <button type="button" class="btn btn-ghost danger-text" (click)="deleteProfile()">
             Supprimer le profil

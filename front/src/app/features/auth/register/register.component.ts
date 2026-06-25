@@ -20,9 +20,8 @@ export class RegisterComponent {
   private photoFile: File | null = null;
 
   readonly roles: { value: Role; label: string }[] = [
-    { value: 'ORGANISATEUR', label: 'Organisateur' },
-    { value: 'PRESTATAIRE', label: 'Prestataire' },
-    { value: 'ADMIN', label: 'Administrateur' },
+    { value: 'ORGANISATEUR', label: 'Organisateur d\'événements' },
+    { value: 'PRESTATAIRE',  label: 'Prestataire de services' },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -32,9 +31,24 @@ export class RegisterComponent {
     role: ['ORGANISATEUR' as Role, Validators.required],
   });
 
+  photoError = '';
+
   onPhotoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
+    this.photoError = '';
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.photoError = 'La photo ne doit pas dépasser 5 Mo.';
+        input.value = '';
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        this.photoError = 'Seules les images sont acceptées.';
+        input.value = '';
+        return;
+      }
+    }
     this.photoFile = file;
   }
 

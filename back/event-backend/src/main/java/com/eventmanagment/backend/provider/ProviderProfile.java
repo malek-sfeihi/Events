@@ -55,6 +55,9 @@ public class ProviderProfile {
     @Column(length = 1000)
     private String availabilityNotes;
 
+    @Column(length = 512)
+    private String logoUrl;
+
     @Column(nullable = false)
     private Instant createdAt;
 

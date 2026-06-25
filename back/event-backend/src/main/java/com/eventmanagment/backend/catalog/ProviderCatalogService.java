@@ -50,6 +50,7 @@ public class ProviderCatalogService {
                 p.getMaxCapacity(),
                 p.getAcceptedEventTypes(),
                 p.getMinimumPrice(),
-                p.getAvailabilityNotes());
+                p.getAvailabilityNotes(),
+                p.getLogoUrl());
     }
 }
