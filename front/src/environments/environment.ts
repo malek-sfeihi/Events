@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://REMPLACER_PAR_URL_RAILWAY_BACKEND',
+  apiBaseUrl: 'https://events-production-7b67.up.railway.app',
 };
