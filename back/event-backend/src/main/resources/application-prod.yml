@@ -18,3 +18,6 @@ recommendation:
     enabled: true
     base-url: ${AI_SERVICE_URL}
     score-path: /api/v1/recommendations/score
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:*,http://127.0.0.1:*}
