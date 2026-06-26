@@ -39,13 +39,15 @@ public class ProdAdminInitializer implements ApplicationRunner {
             return;
         }
 
-        if (userRepository.existsByEmail(adminEmail)) {
-            log.info("ProdAdminInitializer : admin {} existe déjà, skip.", adminEmail);
+        String normalizedEmail = adminEmail.trim().toLowerCase();
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            log.info("ProdAdminInitializer : admin {} existe déjà, skip.", normalizedEmail);
             return;
         }
 
         userRepository.save(User.builder()
-                .email(adminEmail)
+                .email(normalizedEmail)
                 .fullName("Admin")
                 .password(passwordEncoder.encode(adminPassword))
                 .role(Role.ADMIN)
