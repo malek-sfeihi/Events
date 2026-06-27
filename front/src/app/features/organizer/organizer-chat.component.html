@@ -1,0 +1,109 @@
+<section class="panel motion-fade chat-panel">
+  <!-- En-tête -->
+  <div class="chat-header">
+    <h1 class="panel-title">
+      <span class="chat-bot-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="8" width="18" height="11" rx="2"/>
+          <path d="M7 8V6a5 5 0 0110 0v2"/>
+          <circle cx="9" cy="14" r="1" fill="currentColor"/>
+          <circle cx="15" cy="14" r="1" fill="currentColor"/>
+        </svg>
+      </span>
+      EventBot IA
+    </h1>
+    <p class="panel-lead">
+      Posez vos questions sur la planification d'événements, le choix de prestataires, la gestion du budget…
+      <strong>Entrée</strong> pour envoyer, <strong>Maj+Entrée</strong> pour un retour à la ligne.
+    </p>
+  </div>
+
+  <!-- Zone de messages -->
+  <div class="chat-messages" #chatContainer>
+    @if (messages().length === 0 && !loading()) {
+      <div class="chat-welcome">
+        <div class="chat-welcome-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="8" width="18" height="11" rx="2"/>
+            <path d="M7 8V6a5 5 0 0110 0v2"/>
+            <circle cx="9" cy="14" r="1" fill="currentColor"/>
+            <circle cx="15" cy="14" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <p class="chat-welcome-text">Bonjour ! Je suis <strong>EventBot</strong>, votre assistant IA.</p>
+        <div class="chat-suggestions">
+          <button class="chat-suggestion-chip" (click)="inputText = 'Quels prestataires recommandes-tu pour un mariage de 200 personnes ?'; send()">
+            Prestataires pour un mariage
+          </button>
+          <button class="chat-suggestion-chip" (click)="inputText = 'Comment optimiser mon budget événementiel ?'; send()">
+            Optimiser le budget
+          </button>
+          <button class="chat-suggestion-chip" (click)="inputText = 'Rédige un modèle d\'invitation pour une conférence.'; send()">
+            Modèle d'invitation
+          </button>
+        </div>
+      </div>
+    }
+
+    @for (msg of messages(); track $index) {
+      <div class="chat-bubble" [class.chat-bubble--user]="msg.role === 'user'" [class.chat-bubble--assistant]="msg.role === 'assistant'">
+        @if (msg.role === 'assistant') {
+          <div class="chat-bubble-avatar" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="8" width="18" height="11" rx="2"/>
+              <path d="M7 8V6a5 5 0 0110 0v2"/>
+              <circle cx="9" cy="14" r="1" fill="currentColor"/>
+              <circle cx="15" cy="14" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+        }
+        <div class="chat-bubble-text">{{ msg.content }}</div>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="chat-bubble chat-bubble--assistant">
+        <div class="chat-bubble-avatar" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="8" width="18" height="11" rx="2"/>
+            <path d="M7 8V6a5 5 0 0110 0v2"/>
+            <circle cx="9" cy="14" r="1" fill="currentColor"/>
+            <circle cx="15" cy="14" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="chat-typing">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    }
+
+    <div #messagesEnd></div>
+  </div>
+
+  @if (error()) {
+    <p class="panel-error" role="alert">{{ error() }}</p>
+  }
+
+  <!-- Zone de saisie -->
+  <div class="chat-input-bar">
+    <textarea
+      class="chat-textarea"
+      [(ngModel)]="inputText"
+      (keydown)="onKeydown($event)"
+      placeholder="Écrivez votre message…"
+      rows="2"
+      [disabled]="loading()"
+    ></textarea>
+    <button
+      class="btn btn-accent chat-send-btn"
+      (click)="send()"
+      [disabled]="loading() || !inputText.trim()"
+      aria-label="Envoyer"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 2L11 13"/>
+        <path d="M22 2L15 22 11 13 2 9l20-7z"/>
+      </svg>
+    </button>
+  </div>
+</section>

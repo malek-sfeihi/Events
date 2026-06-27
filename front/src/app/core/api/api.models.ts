@@ -102,3 +102,17 @@ export interface AdminPendingProviderDto {
   fullName: string;
   profile: ProviderProfileDto;
 }
+
+export interface ChatHistoryItem {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatRequestPayload {
+  message: string;
+  history: ChatHistoryItem[];
+}
+
+export interface ChatResponseDto {
+  reply: string;
+}

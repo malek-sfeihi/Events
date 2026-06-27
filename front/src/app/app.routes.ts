@@ -52,6 +52,11 @@ export const routes: Routes = [
             (m) => m.OrganizerReservationsComponent,
           ),
       },
+      {
+        path: 'chat',
+        loadComponent: () =>
+          import('./features/organizer/organizer-chat.component').then((m) => m.OrganizerChatComponent),
+      },
     ],
   },
   {
